@@ -21,6 +21,8 @@ import manabboro.roomdatabase.sample.models.Note;
 import manabboro.roomdatabase.sample.repository.NoteRepository;
 import manabboro.roomdatabase.sample.ui.addNotes.NewNoteActivity;
 
+import static manabboro.roomdatabase.sample.ui.addNotes.NewNoteActivity.EXTRA_NOTE;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int GRID_COUNT = 2;
@@ -29,6 +31,18 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private View noDataLayout;
     private NoteAdapter mAdapter;
+
+    /**
+     *
+     */
+    private final NoteAdapter.OnItemClickListener itemClickListener = new NoteAdapter.OnItemClickListener() {
+        @Override
+        public void onItemClicked(Note note) {
+            Intent intent = new Intent(MainActivity.this, NewNoteActivity.class);
+            intent.putExtra(EXTRA_NOTE, note);
+            startActivityFromChild(MainActivity.this, intent, REQ_CODE);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         StaggeredGridLayoutManager mLayoutManager = new StaggeredGridLayoutManager(GRID_COUNT, StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new NoteAdapter(this);
+        mAdapter = new NoteAdapter(this, itemClickListener);
         mRecyclerView.setAdapter(mAdapter);
 
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -81,8 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-
+    
     private void showNoDataLayout() {
         mRecyclerView.setVisibility(View.GONE);
         noDataLayout.setVisibility(View.VISIBLE);

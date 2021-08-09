@@ -45,7 +45,7 @@
             android:hint="Note"
             android:padding="16dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            android:textSize="19sp" />
+            android:textSize="17sp" />
 
         <TextView
             android:id="@+id/date"

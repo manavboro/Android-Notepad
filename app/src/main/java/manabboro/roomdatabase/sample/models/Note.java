@@ -4,8 +4,10 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import java.io.Serializable;
+
 @Entity
-public class Note {
+public class Note implements Serializable {
 
     @PrimaryKey(autoGenerate = true)
     public int uid;
@@ -18,6 +20,9 @@ public class Note {
 
     @ColumnInfo(name = "note_taken")
     public long dateTaken;
+
+    @ColumnInfo(name = "note_bg_color")
+    public int bgColor;
 
 
     public String getTitle() {
@@ -47,4 +52,13 @@ public class Note {
     public int getUid() {
         return uid;
     }
+
+    public int getBgColor() {
+        return bgColor;
+    }
+
+    public void setBgColor(int bgColor) {
+        this.bgColor = bgColor;
+    }
 }
+
