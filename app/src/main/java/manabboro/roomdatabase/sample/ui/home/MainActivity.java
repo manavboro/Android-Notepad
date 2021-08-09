@@ -2,19 +2,22 @@ package manabboro.roomdatabase.sample.ui.home;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.List;
+
 import manabboro.roomdatabase.sample.R;
-import manabboro.roomdatabase.sample.ui.add.NewNoteActivity;
+import manabboro.roomdatabase.sample.models.Note;
+import manabboro.roomdatabase.sample.roomDb.NoteRepository;
+import manabboro.roomdatabase.sample.ui.addNotes.NewNoteActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
         mRecyclerView = findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
-        GridLayoutManager mLayoutManager = new GridLayoutManager(this, GRID_COUNT);
+        StaggeredGridLayoutManager mLayoutManager = new StaggeredGridLayoutManager(GRID_COUNT, StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         mAdapter = new NoteAdapter(this);
@@ -45,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, NewNoteActivity.class));
+                Intent intent = new Intent(MainActivity.this, NewNoteActivity.class);
+                startActivityFromChild(MainActivity.this, intent, 100);
             }
         });
 
@@ -57,26 +61,28 @@ public class MainActivity extends AppCompatActivity {
      * Method to get notes from room database
      */
     private void getNotes() {
+        NoteRepository mRepository = new NoteRepository(getApplication());
+        List<Note> notes = mRepository.getAllNotes();
 
+        if (notes == null || notes.isEmpty()) {
+            showNoDataLayout();
+            return;
+        }
+
+        mAdapter.updateNotes(notes);
     }
 
-    /**
-     *
-     */
+
     private void showNoDataLayout() {
         mRecyclerView.setVisibility(View.GONE);
         noDataLayout.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == 100 && resultCode == RESULT_OK) {
+            getNotes();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
-    }
-
 }

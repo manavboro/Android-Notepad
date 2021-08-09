@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,11 +14,12 @@ import java.util.List;
 
 import manabboro.roomdatabase.sample.R;
 import manabboro.roomdatabase.sample.models.Note;
+import manabboro.roomdatabase.sample.util.DateUtils;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
 
     private LayoutInflater mInflater;
-    private List<Note> notes=new ArrayList<>();
+    private List<Note> notes = new ArrayList<>();
 
     public NoteAdapter(Context context) {
         mInflater = LayoutInflater.from(context);
@@ -32,17 +34,35 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull NoteAdapter.NoteViewHolder holder, int position) {
-
+        holder.bind(notes.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return 5;
+        return notes.size();
+    }
+
+    public void updateNotes(List<Note> notes) {
+        this.notes = notes;
+        notifyDataSetChanged();
     }
 
     static class NoteViewHolder extends RecyclerView.ViewHolder {
+        private TextView mTitle, mNotes, mDate;
+
         public NoteViewHolder(@NonNull View itemView) {
             super(itemView);
+
+            mTitle = itemView.findViewById(R.id.tile);
+            mNotes = itemView.findViewById(R.id.note);
+            mDate = itemView.findViewById(R.id.date);
+        }
+
+        public void bind(Note note) {
+            mTitle.setText(note.getTitle());
+            mNotes.setText(note.getNote());
+            mDate.setText(DateUtils.formatDate(note.getDateTaken()));
+
         }
     }
 }
