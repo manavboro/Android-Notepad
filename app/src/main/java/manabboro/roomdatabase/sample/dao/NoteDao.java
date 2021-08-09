@@ -1,5 +1,6 @@
-package manabboro.roomdatabase.sample.roomDb;
+package manabboro.roomdatabase.sample.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -13,7 +14,7 @@ import manabboro.roomdatabase.sample.models.Note;
 public interface NoteDao {
 
     @Query("SELECT * FROM Note")
-    List<Note> getAllNotes();
+    LiveData<List<Note>> getAllNotes();
 
     @Query("SELECT * FROM Note WHERE uid IN (:userIds)")
     List<Note> loadAllByIds(int[] userIds);

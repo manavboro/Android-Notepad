@@ -1,5 +1,6 @@
 package manabboro.roomdatabase.sample.ui.addNotes;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,7 +14,8 @@ import androidx.appcompat.widget.Toolbar;
 
 import manabboro.roomdatabase.sample.R;
 import manabboro.roomdatabase.sample.models.Note;
-import manabboro.roomdatabase.sample.roomDb.NoteRepository;
+import manabboro.roomdatabase.sample.repository.NoteRepository;
+import manabboro.roomdatabase.sample.util.DateUtils;
 
 public class NewNoteActivity extends AppCompatActivity {
     private EditText titleEditText;
@@ -32,8 +34,9 @@ public class NewNoteActivity extends AppCompatActivity {
 
         titleEditText = findViewById(R.id.title);
         noteEditText = findViewById(R.id.note);
-        dateTextView = findViewById(R.id.date);
 
+        dateTextView = findViewById(R.id.date);
+        dateTextView.setText(DateUtils.formatDate(System.currentTimeMillis()));
 
     }
 
@@ -66,6 +69,10 @@ public class NewNoteActivity extends AppCompatActivity {
 
         NoteRepository mRepository = new NoteRepository(getApplication());
         mRepository.insert(noteModel);
+
+        Intent intent=new Intent();
+        intent.setFlags(RESULT_OK);
+        setIntent(intent);
         finish();
     }
 }

@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import manabboro.roomdatabase.sample.R;
 import manabboro.roomdatabase.sample.models.Note;
+import manabboro.roomdatabase.sample.util.ColorUtils;
 import manabboro.roomdatabase.sample.util.DateUtils;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
@@ -49,6 +51,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
     static class NoteViewHolder extends RecyclerView.ViewHolder {
         private TextView mTitle, mNotes, mDate;
+        private CardView mCardView;
 
         public NoteViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -56,13 +59,19 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
             mTitle = itemView.findViewById(R.id.tile);
             mNotes = itemView.findViewById(R.id.note);
             mDate = itemView.findViewById(R.id.date);
+            mCardView = itemView.findViewById(R.id.card_view);
         }
 
         public void bind(Note note) {
+
             mTitle.setText(note.getTitle());
             mNotes.setText(note.getNote());
             mDate.setText(DateUtils.formatDate(note.getDateTaken()));
 
+            if (note.getTitle() == null || note.getTitle().isEmpty()) {
+                mTitle.setVisibility(View.GONE);
+            }
+            mCardView.setCardBackgroundColor((ColorUtils.generateRandomColor()));
         }
     }
 }

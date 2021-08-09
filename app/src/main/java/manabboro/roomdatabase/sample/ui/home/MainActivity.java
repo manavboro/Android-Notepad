@@ -7,6 +7,8 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -16,12 +18,14 @@ import java.util.List;
 
 import manabboro.roomdatabase.sample.R;
 import manabboro.roomdatabase.sample.models.Note;
-import manabboro.roomdatabase.sample.roomDb.NoteRepository;
+import manabboro.roomdatabase.sample.repository.NoteRepository;
 import manabboro.roomdatabase.sample.ui.addNotes.NewNoteActivity;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int GRID_COUNT = 2;
+    private static final int REQ_CODE = 100;
+
     private RecyclerView mRecyclerView;
     private View noDataLayout;
     private NoteAdapter mAdapter;
@@ -49,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, NewNoteActivity.class);
-                startActivityFromChild(MainActivity.this, intent, 100);
+                startActivityFromChild(MainActivity.this, intent, REQ_CODE);
             }
         });
 
@@ -62,14 +66,20 @@ public class MainActivity extends AppCompatActivity {
      */
     private void getNotes() {
         NoteRepository mRepository = new NoteRepository(getApplication());
-        List<Note> notes = mRepository.getAllNotes();
+        LiveData<List<Note>> notes = mRepository.getAllNotes();
+        notes.observe(this, new Observer<List<Note>>() {
+            @Override
+            public void onChanged(List<Note> notes) {
+                if (notes == null || notes.isEmpty()) {
+                    showNoDataLayout();
+                    return;
+                }
 
-        if (notes == null || notes.isEmpty()) {
-            showNoDataLayout();
-            return;
-        }
+                mAdapter.updateNotes(notes);
+            }
+        });
 
-        mAdapter.updateNotes(notes);
+
     }
 
 
@@ -80,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == 100 && resultCode == RESULT_OK) {
+        if (requestCode == REQ_CODE && resultCode == RESULT_OK) {
             getNotes();
         }
         super.onActivityResult(requestCode, resultCode, data);
