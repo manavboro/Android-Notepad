@@ -50,7 +50,13 @@ public class NewNoteActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) onBackPressed();
         else if (item.getItemId() == R.id.action_save) saveNote();
+        else if (item.getItemId() == R.id.action_delete) deleteNote();
         return super.onOptionsItemSelected(item);
+    }
+
+
+    private void deleteNote() {
+
     }
 
     private void saveNote() {

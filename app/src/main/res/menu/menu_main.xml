@@ -3,8 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="manabboro.roomdatabase.sample.ui.home.MainActivity">
     <item
-        android:id="@+id/action_save"
+        android:id="@+id/action_delete"
+        android:icon="@drawable/ic_baseline_delete_24"
         android:orderInCategory="100"
+        android:title="Delete"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_save"
+        android:orderInCategory="101"
         android:title="@string/action_save"
         app:showAsAction="always" />
 </menu>
