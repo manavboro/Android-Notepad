@@ -15,16 +15,17 @@ import java.util.List;
 
 import manabboro.roomdatabase.sample.R;
 import manabboro.roomdatabase.sample.models.Note;
-import manabboro.roomdatabase.sample.util.ColorUtils;
 import manabboro.roomdatabase.sample.util.DateUtils;
 
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
 
+    private final OnItemClickListener callback;
     private LayoutInflater mInflater;
     private List<Note> notes = new ArrayList<>();
 
-    public NoteAdapter(Context context) {
+    public NoteAdapter(Context context, OnItemClickListener callback) {
         mInflater = LayoutInflater.from(context);
+        this.callback = callback;
     }
 
     @NonNull
@@ -37,6 +38,12 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     @Override
     public void onBindViewHolder(@NonNull NoteAdapter.NoteViewHolder holder, int position) {
         holder.bind(notes.get(position));
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                callback.onItemClicked(notes.get(position));
+            }
+        });
     }
 
     @Override
@@ -71,7 +78,11 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
             if (note.getTitle() == null || note.getTitle().isEmpty()) {
                 mTitle.setVisibility(View.GONE);
             }
-            mCardView.setCardBackgroundColor((ColorUtils.generateRandomColor()));
+            mCardView.setCardBackgroundColor(note.getBgColor());
         }
+    }
+
+    public interface OnItemClickListener {
+        void onItemClicked(Note note);
     }
 }

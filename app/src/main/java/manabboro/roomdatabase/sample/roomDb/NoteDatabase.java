@@ -13,20 +13,20 @@ import manabboro.roomdatabase.sample.dao.NoteDao;
 import manabboro.roomdatabase.sample.models.Note;
 
 @Database(entities = {Note.class}, version = 1)
-public abstract class AppDatabase extends RoomDatabase {
+public abstract class NoteDatabase extends RoomDatabase {
     public abstract NoteDao noteDao();
 
-    private static volatile AppDatabase INSTANCE;
+    private static volatile NoteDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;
     public static final ExecutorService databaseWriteExecutor =
             Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
-    public static AppDatabase getDatabase(final Context context) {
+    public static NoteDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
-            synchronized (AppDatabase.class) {
+            synchronized (NoteDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            AppDatabase.class, "notepad_database")
+                            NoteDatabase.class, "notepad_database")
                             .allowMainThreadQueries()
                             .fallbackToDestructiveMigration()
                             .build();

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.LiveData;
@@ -21,6 +20,8 @@ import manabboro.roomdatabase.sample.models.Note;
 import manabboro.roomdatabase.sample.repository.NoteRepository;
 import manabboro.roomdatabase.sample.ui.addNotes.NewNoteActivity;
 
+import static manabboro.roomdatabase.sample.ui.addNotes.NewNoteActivity.EXTRA_NOTE;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int GRID_COUNT = 2;
@@ -29,6 +30,18 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private View noDataLayout;
     private NoteAdapter mAdapter;
+
+    /**
+     *
+     */
+    private final NoteAdapter.OnItemClickListener itemClickListener = new NoteAdapter.OnItemClickListener() {
+        @Override
+        public void onItemClicked(Note note) {
+            Intent intent = new Intent(MainActivity.this, NewNoteActivity.class);
+            intent.putExtra(EXTRA_NOTE, note);
+            startActivityFromChild(MainActivity.this, intent, REQ_CODE);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         StaggeredGridLayoutManager mLayoutManager = new StaggeredGridLayoutManager(GRID_COUNT, StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new NoteAdapter(this);
+        mAdapter = new NoteAdapter(this, itemClickListener);
         mRecyclerView.setAdapter(mAdapter);
 
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -65,34 +78,21 @@ public class MainActivity extends AppCompatActivity {
      * Method to get notes from room database
      */
     private void getNotes() {
-        NoteRepository mRepository = new NoteRepository(getApplication());
+        NoteRepository mRepository = NoteRepository.getInstance(getApplication());
         LiveData<List<Note>> notes = mRepository.getAllNotes();
         notes.observe(this, new Observer<List<Note>>() {
             @Override
             public void onChanged(List<Note> notes) {
-                if (notes == null || notes.isEmpty()) {
-                    showNoDataLayout();
-                    return;
-                }
-
                 mAdapter.updateNotes(notes);
+
+                showNoDataLayout(notes.size());
             }
         });
-
-
     }
 
-
-    private void showNoDataLayout() {
-        mRecyclerView.setVisibility(View.GONE);
-        noDataLayout.setVisibility(View.VISIBLE);
+    private void showNoDataLayout(int listSize) {
+        mRecyclerView.setVisibility(listSize == 0 ? View.GONE : View.VISIBLE);
+        noDataLayout.setVisibility(listSize == 0 ? View.VISIBLE : View.GONE);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == REQ_CODE && resultCode == RESULT_OK) {
-            getNotes();
-        }
-        super.onActivityResult(requestCode, resultCode, data);
-    }
 }

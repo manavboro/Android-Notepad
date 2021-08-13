@@ -15,12 +15,17 @@ import androidx.appcompat.widget.Toolbar;
 import manabboro.roomdatabase.sample.R;
 import manabboro.roomdatabase.sample.models.Note;
 import manabboro.roomdatabase.sample.repository.NoteRepository;
+import manabboro.roomdatabase.sample.util.ColorUtils;
 import manabboro.roomdatabase.sample.util.DateUtils;
 
 public class NewNoteActivity extends AppCompatActivity {
+    public static final String EXTRA_NOTE = "_note";
+
     private EditText titleEditText;
     private EditText noteEditText;
     private TextView dateTextView;
+
+    private Note noteModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,15 +39,28 @@ public class NewNoteActivity extends AppCompatActivity {
 
         titleEditText = findViewById(R.id.title);
         noteEditText = findViewById(R.id.note);
-
         dateTextView = findViewById(R.id.date);
-        dateTextView.setText(DateUtils.formatDate(System.currentTimeMillis()));
+
+        if (getIntent() != null) {
+            noteModel = (Note) getIntent().getSerializableExtra(EXTRA_NOTE);
+
+            //set data
+            if (noteModel != null) {
+                titleEditText.setText(noteModel.getTitle());
+                noteEditText.setText(noteModel.getNote());
+            }
+        }
+
+        dateTextView.setText(DateUtils.formatDate(noteModel == null ? System.currentTimeMillis() : noteModel.dateTaken));
 
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        // add delete menu if intent data is not null
+        menu.findItem(R.id.action_delete).setVisible(noteModel != null);
         return true;
     }
 
@@ -56,7 +74,11 @@ public class NewNoteActivity extends AppCompatActivity {
 
 
     private void deleteNote() {
-
+        if (noteModel == null) return;
+        NoteRepository mRepository = NoteRepository.getInstance(getApplication());
+        mRepository.delete(noteModel);
+        Toast.makeText(this, "Note deleted", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     private void saveNote() {
@@ -68,15 +90,25 @@ public class NewNoteActivity extends AppCompatActivity {
             return;
         }
 
-        Note noteModel = new Note();
-        noteModel.setTitle(title);
-        noteModel.setNote(note);
-        noteModel.setDateTaken(System.currentTimeMillis());
+        NoteRepository mRepository = NoteRepository.getInstance(getApplication());
 
-        NoteRepository mRepository = new NoteRepository(getApplication());
-        mRepository.insert(noteModel);
+        if (noteModel == null) {
+            noteModel = new Note();
+            noteModel.setTitle(title);
+            noteModel.setNote(note);
+            noteModel.setBgColor(ColorUtils.generateRandomColor());
+            noteModel.setDateTaken(System.currentTimeMillis());
+            mRepository.insert(noteModel);
 
-        Intent intent=new Intent();
+        } else {
+            noteModel.setTitle(title);
+            noteModel.setNote(note);
+            noteModel.setDateTaken(System.currentTimeMillis());
+            mRepository.update(noteModel);
+        }
+
+
+        Intent intent = new Intent();
         intent.setFlags(RESULT_OK);
         setIntent(intent);
         finish();

@@ -22,8 +22,8 @@
             android:layout_centerInParent="true"
             android:gravity="center"
             android:padding="24dp"
-            android:text="Once you add some notes, you will find it here"
+            android:text="@string/message"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            android:textSize="21sp" />
+            android:textSize="17sp" />
     </RelativeLayout>
 </FrameLayout>
