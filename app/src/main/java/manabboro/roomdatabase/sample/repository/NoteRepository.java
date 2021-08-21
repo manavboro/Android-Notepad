@@ -15,17 +15,15 @@ public class NoteRepository {
 
     private static NoteRepository instance = null;
     private final NoteDao mNoteDao;
-    private LiveData<List<Note>> mNotes;
+    private final LiveData<List<Note>> mNotes;
+    private final MutableLiveData<Note> notes;
 
-    public static NoteRepository getInstance(Application application) {
-        if (instance == null) instance = new NoteRepository(application);
-        return instance;
-    }
 
-    private NoteRepository(Application application) {
+    public NoteRepository(Application application) {
         NoteDatabase db = NoteDatabase.getDatabase(application);
         mNoteDao = db.noteDao();
-        mNotes = mNoteDao.getAllNotes();
+        mNotes = db.noteDao().getAllNotes();
+        notes = new MutableLiveData<>();
     }
 
     // Room executes all queries on a separate thread.
@@ -52,5 +50,12 @@ public class NoteRepository {
         NoteDatabase.databaseWriteExecutor.execute(() -> {
             mNoteDao.delete(note);
         });
+    }
+
+    public LiveData<Note> getNote(int noteId) {
+        NoteDatabase.databaseWriteExecutor.execute(()->{
+            notes.postValue(mNoteDao.findById(noteId));
+        });
+        return notes;
     }
 }

@@ -6,6 +6,8 @@ import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
 
+import manabboro.roomdatabase.sample.util.DateUtils;
+
 @Entity
 public class Note implements Serializable {
 
@@ -59,6 +61,12 @@ public class Note implements Serializable {
 
     public void setBgColor(int bgColor) {
         this.bgColor = bgColor;
+    }
+
+    public String getDateInString() {
+        return (DateUtils.formatDate(dateTaken == 0 ?
+                System.currentTimeMillis() : dateTaken));
+
     }
 }
 

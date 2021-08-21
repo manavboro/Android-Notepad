@@ -21,7 +21,7 @@ public interface NoteDao {
     List<Note> loadAllByIds(int[] userIds);
 
     @Query("SELECT * FROM Note WHERE uid LIKE :uid  LIMIT 1")
-    Note findById(String uid);
+    Note findById(int uid);
 
     @Insert
     void insertAll(Note... notes);

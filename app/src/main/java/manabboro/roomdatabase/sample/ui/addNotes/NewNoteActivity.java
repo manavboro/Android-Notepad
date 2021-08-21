@@ -10,30 +10,33 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import manabboro.roomdatabase.sample.R;
+import manabboro.roomdatabase.sample.databinding.ActivityNewNoteBinding;
 import manabboro.roomdatabase.sample.models.Note;
 import manabboro.roomdatabase.sample.repository.NoteRepository;
 import manabboro.roomdatabase.sample.util.ColorUtils;
-import manabboro.roomdatabase.sample.util.DateUtils;
+import manabboro.roomdatabase.sample.viewmodel.AddNoteViewModel;
 
 public class NewNoteActivity extends AppCompatActivity {
-    public static final String EXTRA_NOTE = "_note";
+    public static final String EXTRA_NOTE_ID = "_note_id";
 
     private EditText titleEditText;
     private EditText noteEditText;
     private TextView dateTextView;
 
-    private Note noteModel;
+    private int _noteId = -1;
+    private AddNoteViewModel mViewModel;
+    ActivityNewNoteBinding mBinding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_note);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_new_note);
+        setSupportActionBar(mBinding.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
@@ -42,16 +45,18 @@ public class NewNoteActivity extends AppCompatActivity {
         dateTextView = findViewById(R.id.date);
 
         if (getIntent() != null) {
-            noteModel = (Note) getIntent().getSerializableExtra(EXTRA_NOTE);
-
-            //set data
-            if (noteModel != null) {
-                titleEditText.setText(noteModel.getTitle());
-                noteEditText.setText(noteModel.getNote());
-            }
+            _noteId = getIntent().getIntExtra(EXTRA_NOTE_ID, -1);
         }
 
-        dateTextView.setText(DateUtils.formatDate(noteModel == null ? System.currentTimeMillis() : noteModel.dateTaken));
+        //subscribeUI
+        NoteRepository mRepository = new NoteRepository(getApplication());
+        ViewModelProvider.Factory factory = new ViewModelProvider.Factory() {
+            public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+                return (T) new AddNoteViewModel(mRepository, _noteId);
+            }
+        };
+        mViewModel = new ViewModelProvider(this, factory).get(AddNoteViewModel.class);
+        mViewModel.getNote().observe(this, note -> mBinding.setViewModel(note));
 
     }
 
@@ -60,7 +65,7 @@ public class NewNoteActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         // add delete menu if intent data is not null
-        menu.findItem(R.id.action_delete).setVisible(noteModel != null);
+        menu.findItem(R.id.action_delete).setVisible(mViewModel.getNote() != null);
         return true;
     }
 
@@ -74,11 +79,10 @@ public class NewNoteActivity extends AppCompatActivity {
 
 
     private void deleteNote() {
-        if (noteModel == null) return;
-        NoteRepository mRepository = NoteRepository.getInstance(getApplication());
-        mRepository.delete(noteModel);
-        Toast.makeText(this, "Note deleted", Toast.LENGTH_SHORT).show();
-        finish();
+        if (mViewModel.deleteNote()) {
+            Toast.makeText(this, "Note deleted", Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
     private void saveNote() {
@@ -90,23 +94,22 @@ public class NewNoteActivity extends AppCompatActivity {
             return;
         }
 
-        NoteRepository mRepository = NoteRepository.getInstance(getApplication());
-
-        if (noteModel == null) {
+        Note noteModel;
+        if (mViewModel.getNote().getValue() == null) {
             noteModel = new Note();
             noteModel.setTitle(title);
             noteModel.setNote(note);
             noteModel.setBgColor(ColorUtils.generateRandomColor());
             noteModel.setDateTaken(System.currentTimeMillis());
-            mRepository.insert(noteModel);
+            mViewModel.insert(noteModel);
 
         } else {
+            noteModel=mViewModel.getNote().getValue();
             noteModel.setTitle(title);
             noteModel.setNote(note);
             noteModel.setDateTaken(System.currentTimeMillis());
-            mRepository.update(noteModel);
+            mViewModel.update(noteModel);
         }
-
 
         Intent intent = new Intent();
         intent.setFlags(RESULT_OK);

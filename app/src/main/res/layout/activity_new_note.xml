@@ -1,61 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    tools:context=".ui.addNotes.NewNoteActivity">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <data>
+
+        <variable
+            name="viewModel"
+            type="manabboro.roomdatabase.sample.models.Note" />
+    </data>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Theme.RoomDatabaseSample.AppBarOverlay">
+        android:orientation="vertical"
+        tools:context=".ui.addNotes.NewNoteActivity">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/Theme.RoomDatabaseSample.PopupOverlay" />
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/title"
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@null"
-            android:hint="Title"
-            android:padding="16dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            android:textSize="19sp" />
+            android:theme="@style/Theme.RoomDatabaseSample.AppBarOverlay">
 
-        <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/note"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/title"
-            android:background="@null"
-            android:hint="Note"
-            android:padding="16dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            android:textSize="17sp" />
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:popupTheme="@style/Theme.RoomDatabaseSample.PopupOverlay" />
 
-        <TextView
-            android:id="@+id/date"
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:gravity="center"
-            android:padding="16dp"
-            android:text="21th July, 2021"
-            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-            android:textSize="13sp" />
-    </RelativeLayout>
-</androidx.appcompat.widget.LinearLayoutCompat>
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:hint="Title"
+                android:text="@{viewModel.title}"
+                android:padding="16dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textSize="19sp" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/note"
+                android:hint="Write your note here"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/title"
+                android:background="@null"
+                android:text="@{viewModel.note}"
+                android:padding="16dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:gravity="center"
+                android:padding="16dp"
+                android:text="@{viewModel.getDateInString()}"
+                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textSize="13sp" />
+        </RelativeLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</layout>
